@@ -6,7 +6,7 @@
  * _putchar - writes the character to stdout
  * @c: character to write
  *
- * Return: 
+ * Return: 1 - the number of chars written to stdout 
  */
 int _putchar(const char c)
 {
@@ -33,35 +33,29 @@ int _printf(const char *format, ...)
 
 	print printer[] = {
 		{"c", print_char},
-		{"s", print_str}
+		{"s", print_str},
+		{"d", print_int},
+		{"i", print_int}
 	};
 
 	va_start(args, format);
 
 	while (*ptr != '\0')
 	{
-		/*
-		 * handles the specifier
-		 */
 		if (*ptr != '%')
-		{
-			_putchar(*ptr);
-			ptr++;
-			i++;
-		}
+			i+= _putchar(*ptr);
 		else
 		{
 			ptr++;
 			j = 0;
-			while (j < 2)
+			while (j < (sizeof(printer) / sizeof(printer[0])))
 			{
 				if (*(printer[j].conversion) == *ptr)
-				{
 					i += printer[j].function(args);
-				}
 				j++;
 			}
 		}
+		ptr++;
 	}
 	va_end(args);
 	return (i);
