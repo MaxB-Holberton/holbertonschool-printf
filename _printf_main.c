@@ -29,6 +29,7 @@ int _printf(const char *format, ...)
 	va_list args;
 	unsigned int i = 0;
 	unsigned int j = 0;
+	unsigned int s_size;
 	const char *ptr = format;
 
 	print printer[] = {
@@ -37,22 +38,38 @@ int _printf(const char *format, ...)
 		{"d", print_int},
 		{"i", print_int}
 	};
-
+	
+	s_size = (sizeof(printer) / sizeof(printer[0]));
 	va_start(args, format);
 
 	while (*ptr != '\0')
 	{
 		if (*ptr != '%')
-			i+= _putchar(*ptr);
+			i += _putchar(*ptr);
 		else
 		{
 			ptr++;
-			j = 0;
-			while (j < (sizeof(printer) / sizeof(printer[0])))
+			if (*ptr == '\0')
+				return (i);
+			if (*ptr == '%')
+				i += _putchar('%');
+			else
 			{
-				if (*(printer[j].conversion) == *ptr)
-					i += printer[j].function(args);
-				j++;
+				j = 0;
+				while (j < s_size)
+				{
+					if (*(printer[j].conversion) == *ptr)
+					{
+						i += printer[j].function(args);
+						break;
+					}
+					j++;
+				}
+				if (j == s_size)
+				{
+					i += _putchar('%');
+					i += _putchar(*ptr);
+				}
 			}
 		}
 		ptr++;
