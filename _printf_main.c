@@ -12,10 +12,6 @@ int _putchar(const char c)
 {
 	return (write(1, &c, 1));
 }
-/**
- * Args_check - check # of args to 
- *
- */
 
 /**
  * _printf - the copy of printf
@@ -36,7 +32,11 @@ int _printf(const char *format, ...)
 		{"c", print_char},
 		{"s", print_str},
 		{"d", print_int},
-		{"i", print_int}
+		{"i", print_int},
+		{"u", print_unsigned},
+		{"o", print_octal},
+		{"x", print_hex_l},
+		{"X", print_hex_u}
 	};
 	
 	s_size = (sizeof(printer) / sizeof(printer[0]));
