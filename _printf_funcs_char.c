@@ -37,3 +37,36 @@ int print_str(va_list arg)
 		_putchar(str[i]);
 	return (i);
 }
+
+int print_ascii(va_list arg)
+{
+	char *str;
+	unsigned int i = 0;
+	unsigned int j = 0;
+
+	str = va_arg(arg, char *);
+	if (str == NULL)
+        {
+                _putchar('(');
+                _putchar('n');
+                _putchar('u');
+                _putchar('l');
+                _putchar('l');
+                _putchar(')');
+                return (6);
+        }
+        for (j = 0; str[j] != '\0'; j++)
+	{
+		if (str[j] >= 32 && str[j] < 127)
+		{
+			i += _putchar(str[j]);
+			continue;
+		}
+		i += _putchar('\\');
+		i += _putchar('x');
+		if (str[j] < 16)
+			i += _putchar('0');
+		i += hex_u_rec(str[j]);
+	}
+        return (i);
+}

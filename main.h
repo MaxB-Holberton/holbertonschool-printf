@@ -10,7 +10,10 @@ int print_int(va_list arg);
 int print_unsigned(va_list arg);
 int print_hex_l(va_list arg);
 int print_hex_u(va_list arg);
+unsigned int hex_u_rec(unsigned int n);
 int print_octal(va_list arg);
+int print_binary(va_list arg);
+int print_ascii(va_list arg);
 
 typedef struct _printf_struct
 {

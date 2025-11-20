@@ -12,7 +12,26 @@ int _putchar(const char c)
 {
 	return (write(1, &c, 1));
 }
-
+char *createbuffer(void)
+{
+	const int buffersize = 1024;
+	int i;
+	char *buffer;
+	buffer = malloc(buffersize * sizeof(char));
+	if (buffer == NULL)
+		return (NULL);
+	for (i = 0; i < bufersize; i++)
+	{
+		buffer[i] = '0';
+	}
+	return (buffer);
+}
+int _putbuffer(const char *str, unsigned int buf)
+{
+	unsigned int i = 0;
+	i = write(1, &str, buf);
+	/*free (str)*/
+}
 /**
  * _printf - the copy of printf
  * @format: character formatting
@@ -36,7 +55,9 @@ int _printf(const char *format, ...)
 		{"u", print_unsigned},
 		{"o", print_octal},
 		{"x", print_hex_l},
-		{"X", print_hex_u}
+		{"X", print_hex_u},
+		{"b", print_binary},
+		{"S", print_ascii}
 	};
 	
 	s_size = (sizeof(printer) / sizeof(printer[0]));
