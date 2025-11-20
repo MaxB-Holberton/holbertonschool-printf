@@ -1,7 +1,7 @@
 #include "main.h"
 #include <unistd.h>
 #include <stdarg.h>
-
+#include <stdlib.h>
 /**
  * _putchar - writes the character to stdout
  * @c: character to write
@@ -12,10 +12,30 @@ int _putchar(const char c)
 {
 	return (write(1, &c, 1));
 }
-/**
- * Args_check - check # of args to 
- *
- */
+
+char *createbuffer(void)
+{
+	int buffersize = 1024;
+	int i;
+	char *buffer;
+	
+	buffer = malloc(buffersize * sizeof(char));
+	if (buffer == NULL)
+		return (NULL);
+	for (i = 0; i < buffersize; i++)
+	{
+		buffer[i] = '0';
+	}
+	return (buffer);
+}
+int printbuffer(char *buffer, unsigned int size)
+{
+	unsigned int i = 0;
+
+	i = write(1, buffer, size);
+	free(buffer);
+	return (i);
+}
 
 /**
  * _printf - the copy of printf
@@ -36,7 +56,14 @@ int _printf(const char *format, ...)
 		{"c", print_char},
 		{"s", print_str},
 		{"d", print_int},
-		{"i", print_int}
+		{"i", print_int},
+		{"u", print_unsigned},
+		{"o", print_octal},
+		{"x", print_hex_l},
+		{"X", print_hex_u},
+		{"b", print_binary},
+		{"S", print_ascii},
+		{"p", print_memory}
 	};
 	
 	s_size = (sizeof(printer) / sizeof(printer[0]));
@@ -50,7 +77,7 @@ int _printf(const char *format, ...)
 		{
 			ptr++;
 			if (*ptr == '\0')
-				return (i);
+				return (-1);
 			if (*ptr == '%')
 				i += _putchar('%');
 			else
