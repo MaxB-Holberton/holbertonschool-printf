@@ -12,6 +12,7 @@ int _putchar(const char c)
 {
 	return (write(1, &c, 1));
 }
+/*
 char *createbuffer(void)
 {
 	const int buffersize = 1024;
@@ -30,8 +31,9 @@ int _putbuffer(const char *str, unsigned int buf)
 {
 	unsigned int i = 0;
 	i = write(1, &str, buf);
-	/*free (str)*/
+	free (str)
 }
+*/
 /**
  * _printf - the copy of printf
  * @format: character formatting
