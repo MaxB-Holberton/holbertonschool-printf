@@ -1,7 +1,7 @@
 #include "main.h"
 #include <unistd.h>
 #include <stdarg.h>
-
+#include <stdlib.h>
 /**
  * _putchar - writes the character to stdout
  * @c: character to write
@@ -12,28 +12,31 @@ int _putchar(const char c)
 {
 	return (write(1, &c, 1));
 }
-/*
+
 char *createbuffer(void)
 {
-	const int buffersize = 1024;
+	int buffersize = 1024;
 	int i;
 	char *buffer;
+	
 	buffer = malloc(buffersize * sizeof(char));
 	if (buffer == NULL)
 		return (NULL);
-	for (i = 0; i < bufersize; i++)
+	for (i = 0; i < buffersize; i++)
 	{
 		buffer[i] = '0';
 	}
 	return (buffer);
 }
-int _putbuffer(const char *str, unsigned int buf)
+int printbuffer(char *buffer, unsigned int size)
 {
 	unsigned int i = 0;
-	i = write(1, &str, buf);
-	free (str)
+
+	i = write(1, buffer, size);
+	free(buffer);
+	return (i);
 }
-*/
+
 /**
  * _printf - the copy of printf
  * @format: character formatting
@@ -59,7 +62,8 @@ int _printf(const char *format, ...)
 		{"x", print_hex_l},
 		{"X", print_hex_u},
 		{"b", print_binary},
-		{"S", print_ascii}
+		{"S", print_ascii},
+		{"p", print_memory}
 	};
 	
 	s_size = (sizeof(printer) / sizeof(printer[0]));

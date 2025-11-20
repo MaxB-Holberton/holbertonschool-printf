@@ -21,9 +21,13 @@ int print_str(va_list arg)
 {
 	char *str;
 	unsigned int i = 0;
+	unsigned int rtn = 0;
+	char *buffer;
 
+	buffer = createbuffer();
 	str = va_arg(arg, char *);
-	if (str == NULL)
+	
+	if (str == NULL || buffer == NULL)
 	{
 		_putchar('(');
 		_putchar('n');
@@ -33,9 +37,20 @@ int print_str(va_list arg)
 		_putchar(')');
 		return (6);
 	}
-	for (i = 0; str[i] != '\0'; i++)
-		_putchar(str[i]);
-	return (i);
+	while (*str != '\0')
+	{
+		if (i == 1024)
+		{
+			rtn += printbuffer(buffer, i);
+			buffer = createbuffer();
+			i = 0;
+		}
+		buffer[i] = *str;
+		str++;
+		i++;
+	}
+	rtn += printbuffer(buffer, i);
+	return (rtn); 
 }
 
 int print_ascii(va_list arg)
@@ -43,6 +58,7 @@ int print_ascii(va_list arg)
 	char *str;
 	unsigned int i = 0;
 	unsigned int j = 0;
+	unsigned int rtn = 0;
 
 	str = va_arg(arg, char *);
 	if (str == NULL)
@@ -55,7 +71,41 @@ int print_ascii(va_list arg)
                 _putchar(')');
                 return (6);
         }
-        for (j = 0; str[j] != '\0'; j++)
+	while (*str != '\0')
+        {
+                if (i == 1024)
+                {
+                        rtn += printbuffer(buffer, i);
+                        buffer = createbuffer();
+			if (buffer == NULL)
+				return (NULL);
+                        i = 0;
+                }
+		if (*str >= 32 && *str < 127)
+		{
+                	buffer[i] = *str;
+			str++;
+			i++;
+			continue;
+		}
+		if ((i + 3) == 1024)
+		{
+
+		}
+		buffer[i] = '\\';
+                i++;
+		buffer[i] = 'x';
+		i++
+		if (*str < 16)
+		{
+			buffer[i] = '0';
+			i++;
+		}
+        }
+        rtn += printbuffer(buffer, i);
+
+
+        /*for (j = 0; str[j] != '\0'; j++)
 	{
 		if (str[j] >= 32 && str[j] < 127)
 		{
@@ -67,6 +117,6 @@ int print_ascii(va_list arg)
 		if (str[j] < 16)
 			i += _putchar('0');
 		i += hex_u_rec(str[j]);
-	}
-        return (i);
+	}*/
+        return (rtn);
 }
