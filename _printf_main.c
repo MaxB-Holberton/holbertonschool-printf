@@ -77,10 +77,12 @@ int printbuffer(char *buffer, unsigned int size)
 int _printf(const char *format, ...)
 {
 	va_list args;
-	unsigned int i = 0;
+	int i = 0;
 	unsigned int j = 0;
+	unsigned int rtn = 0;
 	unsigned int s_size;
 	const char *ptr = format;
+	char *conv;
 
 	print printer[] = {
 		{"c", print_char},
@@ -98,18 +100,26 @@ int _printf(const char *format, ...)
 	
 	s_size = (sizeof(printer) / sizeof(printer[0]));
 	va_start(args, format);
+	conv = createbuffer();	
+	if (conv == NULL)
+		return (-1);
 
 	while (*ptr != '\0')
 	{
+		if (i == 1024)
+		{
+			rtn += writetobuffer(conv);
+			conv = createbuffer();
+		}
 		if (*ptr != '%')
-			i += _putchar(*ptr);
+			conv[i] = *ptr;
 		else
 		{
 			ptr++;
 			if (*ptr == '\0')
 				return (-1);
 			if (*ptr == '%')
-				i += _putchar('%');
+				conv[i] = *ptr;
 			else
 			{
 				j = 0;
@@ -117,20 +127,26 @@ int _printf(const char *format, ...)
 				{
 					if (*(printer[j].conversion) == *ptr)
 					{
-						i += printer[j].function(args);
+						conv[i] = '\0';
+						rtn += writetobuffer(conv);
+						conv = createbuffer();
+						i = -1;
+						rtn += printer[j].function(args);
 						break;
 					}
 					j++;
 				}
 				if (j == s_size)
 				{
-					i += _putchar('%');
-					i += _putchar(*ptr);
+					conv[i] = '%';
+					i++;
+					conv[i] = *ptr;
 				}
 			}
 		}
 		ptr++;
+		i++;
 	}
 	va_end(args);
-	return (i);
+	return (printbuffer(conv, i) + rtn);
 }

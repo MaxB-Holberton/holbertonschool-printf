@@ -21,11 +21,10 @@ int print_char(va_list arg)
 int print_str(va_list arg)
 {
 	char *str;
-	int i = 0;
 
 	str = va_arg(arg, char *);
 
-	if (str == NULL || i == -1)
+	if (str == NULL)
 	{
 		_putchar('(');
 		_putchar('n');
@@ -35,20 +34,19 @@ int print_str(va_list arg)
 		_putchar(')');
 		return (6);
 	}
-	i = writetobuffer(str);
 
-	return (i);
+	return (writetobuffer(str));
 }
 
 int print_ascii(va_list arg)
 {
 	char *str;
 	char *ascii;
-	/*char **asciiaddr = &ascii;*/
+	
 	str = va_arg(arg, char *);
 	ascii = malloc(sizeof(str) * sizeof(char));
 
-	if (str == NULL)
+	if (str == NULL || ascii == NULL)
         {
                 _putchar('(');
                 _putchar('n');
