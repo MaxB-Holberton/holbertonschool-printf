@@ -15,7 +15,7 @@ int _putchar(const char c)
 }
 char *createbuffer(void)
 {
-	int buffersize = 1024;
+	int buffersize = 2048;
 	int i;
 	char *buffer;
 
