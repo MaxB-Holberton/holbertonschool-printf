@@ -1,88 +1,112 @@
 #include "main.h"
 #include <stdarg.h>
 #include <stdio.h>
+#include <stddef.h>
 
-unsigned int octal_rec(unsigned int n, char *conv)
+unsigned int write_octal(unsigned int n, char *buffer, unsigned int i)
 {
-        unsigned int i = 0;
+	unsigned int count = 0;
 
-        if ((n / 8) != 0)
-                i += octal_rec((n / 8), conv);
-        conv[i] = (n % 8 + '0');
-	i++;
-        return (i);
+	if ((n / 8) != 0)
+	{
+		count += write_octal((n / 8), buffer, i);
+		count++;
+	}
+	buffer[count + i] = ((n % 8) + '0');
+	return (count);
+}
+int print_octal(va_list arg, char *buffer, unsigned int *iptr)
+{
+	unsigned int i;
+	unsigned int n;
+
+	n = va_arg(arg, unsigned int);
+
+	i = checkbuffer(buffer, iptr, (sizeof(n) * sizeof(unsigned int)));
+	i += write_octal(n, buffer, i);
+	*iptr = i;
+	return(i);
 }
 
-unsigned int hex_l_rec(unsigned int n, char *conv)
+unsigned int hex_lower(unsigned int n, char *buffer, unsigned int i)
 {
-        unsigned int i = 0;
+	unsigned int count = 0;
 
-        if ((n / 16) != 0)
-                i += hex_l_rec((n / 16), conv);
+	if ((n / 16) != 0)
+	{
+			count += hex_lower((n / 16), buffer, i);
+			count++;
+	}
 	if ((n % 16) > 9)
-		conv[i] =(((n % 16) - 10) + 'a');
+		buffer[count + i] =(((n % 16) - 10) + 'a');
 	else
-        	conv[i] = (n % 16 + '0');
-        i++;
-	return (i);
+		buffer[count + i] = (n % 16 + '0');
+	return (count);
 }
-
-unsigned int hex_u_rec(unsigned int n, char *conv)
+unsigned int hex_upper(unsigned int n, char *buffer, unsigned int i)
 {
-	unsigned int i = 0;
+	unsigned int count = 0;
 
-        if ((n / 16) != 0)
-		i += hex_u_rec((n / 16), conv);
+	if ((n / 16) != 0)
+	{
+		count += hex_upper((n / 16), buffer, i);
+		count++;
+	}
 	if ((n % 16) > 9)
-		conv[i] = (((n % 16) - 10) + 'A');
+		buffer[count + i] = (((n % 16) - 10) + 'A');
 	else
-		conv[i] = (n % 16 + '0');
-	i++;
-        return (i);
+		buffer[count + i] = (n % 16 + '0');
+	return (count);
 }
-unsigned int binary_rec(unsigned int n, char *conv)
+int print_hex_l(va_list arg, char *buffer, unsigned int *iptr)
 {
-	unsigned int i = 0;
+	unsigned int i;
+	unsigned int n;
+	unsigned int count = 0;
+
+	n = va_arg(arg, unsigned int);
+
+	i = checkbuffer(buffer, iptr, (sizeof(n) * sizeof(unsigned int)));
+	count += hex_lower(n, buffer, i);
+	(*iptr) = count + i;
+	return(count);
+}
+
+int print_hex_u(va_list arg, char *buffer, unsigned int *iptr)
+{
+	unsigned int i;
+	unsigned int n;
+	unsigned int count = 0;
+
+	n = va_arg(arg, unsigned int);
+
+	i = checkbuffer(buffer, iptr, (sizeof(n) * sizeof(unsigned int)));
+	count += hex_upper(n, buffer, i);
+	(*iptr) = count + i;
+	return(count);
+}
+unsigned int write_binary(unsigned int n, char *buffer, unsigned int i)
+{
+	unsigned int count = 0;
 
 	if ((n / 2) != 0)
-		i+= binary_rec((n / 2), conv);
-	conv[i] = (n % 2 + '0');
-	i++;
-	return (i);
+	{
+		count += write_binary((n / 2), buffer, i);
+		count++;
+	}
+	buffer[count + i] = ((n % 2) + '0');
+	return (count);
 }
-int print_hex_l(va_list arg)
+int print_binary(va_list arg, char *buffer, unsigned int *iptr)
 {
-	char *conv;
-	int i = 0;
-	conv = createbuffer();
+	unsigned int i;
+	unsigned int n;
+	unsigned int count = 0;
 
-	i += hex_l_rec(va_arg(arg, unsigned int), conv);
-	return (printbuffer(conv, i));
-}
-int print_hex_u(va_list arg)
-{
-	char *conv;
-	int i = 0;
-	conv = createbuffer();
+	n = va_arg(arg, unsigned int);
 
-	i += hex_u_rec(va_arg(arg, unsigned int), conv);
-	return (printbuffer(conv, i));
-}
-int print_octal(va_list arg)
-{
-	char *conv;
-	int i = 0;
-	conv = createbuffer();
-
-        i += octal_rec(va_arg(arg, unsigned int), conv);
-        return (printbuffer(conv, i));
-}
-int print_binary(va_list arg)
-{
-	char *conv;
-	int i = 0;
-	conv = createbuffer();
-
-	i += binary_rec(va_arg(arg, unsigned int), conv);
-	return(printbuffer(conv, i));
+	i = checkbuffer(buffer, iptr, (sizeof(n) * sizeof(unsigned int)));
+	count += write_binary(n, buffer, i);
+	(*iptr) = count + i;
+	return(count);
 }

@@ -1,16 +1,16 @@
 #include "main.h"
 #include <stdarg.h>
 #include <stddef.h>
-#include <stdlib.h>
 /**
  * print_char - print a char
  * @arg: the char to print
  *
  * Return: 1 - since only a single char was printed
  */
-int print_char(va_list arg)
+int print_char(va_list arg, char *buffer, unsigned int *iptr)
 {
-	return(_putchar(va_arg(arg, int)));
+	buffer[*iptr] = va_arg(arg, int);
+	return(1);
 }
 /**
  * print_str - print a string
@@ -18,61 +18,75 @@ int print_char(va_list arg)
  *
  * Return: number of characters printed
  */
-int print_str(va_list arg)
+int print_str(va_list arg, char *buffer, unsigned int *iptr)
 {
 	char *str;
+	unsigned int i;
+	unsigned int count = 0;
 
 	str = va_arg(arg, char *);
-
 	if (str == NULL)
 	{
-		_putchar('(');
-		_putchar('n');
-		_putchar('u');
-		_putchar('l');
-		_putchar('l');
-		_putchar(')');
+		buffer[0 + *iptr] = '(';
+		buffer[1 + *iptr] = 'n';
+		buffer[2 + *iptr] = 'u';
+		buffer[3 + *iptr] = 'l';
+		buffer[4 + *iptr] = 'l';
+		buffer[5 + *iptr] = ')';
+		*iptr = 5 + *iptr;
 		return (6);
 	}
-
-	return (writetobuffer(str));
+	i = checkbuffer(buffer, iptr, sizeof(str) * sizeof(char));
+	while (*str != '\0')
+	{
+		buffer[count + i] = *str;
+		str++;
+		count++;
+	}
+	*iptr = (count - 1) + i;
+	return (count);
 }
 
-int print_ascii(va_list arg)
+int print_ascii(va_list arg, char *buffer, unsigned int *iptr)
 {
 	char *str;
-	char *ascii;
-	
-	str = va_arg(arg, char *);
-	ascii = malloc(sizeof(str) * sizeof(char));
+	unsigned int i;
+	unsigned int count = 0;
 
-	if (str == NULL || ascii == NULL)
-        {
-                _putchar('(');
-                _putchar('n');
-                _putchar('u');
-                _putchar('l');
-                _putchar('l');
-                _putchar(')');
-                return (6);
-        }
+	str = va_arg(arg, char *);
+	if (str == NULL)
+	{
+		buffer[0 + *iptr] = '(';
+		buffer[1 + *iptr] = 'n';
+		buffer[2 + *iptr] = 'u';
+		buffer[3 + *iptr] = 'l';
+		buffer[4 + *iptr] = 'l';
+		buffer[5 + *iptr] = ')';
+		*iptr = 5 + *iptr;
+		return (6);
+	}
+	i = checkbuffer(buffer, iptr, sizeof(str) * sizeof(char));
+
 	while (*str != '\0')
-        {
+	{
 		if (*str >= 32 && *str < 127)
 		{
-			*ascii = *str;
+			buffer[count + i] = *str;
+			str++;
+			count++;
 			continue;
 		}
-		*ascii = '\\';
-                ascii++;
-		*ascii = 'x';
+		buffer[count + i]  = '\\';
+		count++;
+		buffer[count + i]  = 'x';
 		if (*str < 16)
 		{
-			ascii++;
-			*ascii = '0';
+			count++;
+			buffer[count + i]  = '0';
 		}
 		str++;
-		ascii++;
+		count++;
 	}
-	return (writetobuffer(ascii));
+	*iptr = (count - 1) + i;
+	return (count);
 }

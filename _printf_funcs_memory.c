@@ -1,33 +1,36 @@
 #include "main.h"
 #include <stdarg.h>
 #include <stddef.h>
-#include <stdio.h>
-unsigned int memory_hex(unsigned long n, char *conv)
+
+unsigned int memory_hex(unsigned long n, char *buffer, unsigned int i)
 {
-	unsigned int i = 0;
+	unsigned int count = 0;
 
 	if ((n / 16) != 0)
-		i += memory_hex((n / 16), conv);
+	{
+		count += memory_hex((n / 16), buffer, i);
+		count++;
+	}
 	if((n % 16) > 9)
-		conv[i] = (((n % 16) - 10) + 'a');
+		buffer[count + i] = (((n % 16) - 10) + 'a');
 	else
-		conv[i] = (n % 16 + '0');
-	i++;
-	return (i);
+		buffer[count + i] = (n % 16 + '0');
+	return (count);
 }
-int print_memory(va_list arg)
+int print_memory(va_list arg, char *buffer, unsigned int *iptr)
 {
-	char *conv;
-	int i = 0;
+	unsigned int i;
 	unsigned long n;
+	unsigned int count = 0;
 
 	n = va_arg(arg, unsigned long);
 
-	conv = createbuffer();
-	if (conv == NULL)
-		return (-1);
-	_putchar('0');
-	_putchar('x');
-	i += memory_hex(n, conv);
-	return(printbuffer(conv, i));
+	i = checkbuffer(buffer, iptr, (sizeof(n) * sizeof(unsigned long)) + (sizeof(char) * 2));
+	buffer[count + i] = '0';
+	count++;
+	buffer[count + i] = 'x';
+	count++;
+	count += memory_hex(n, buffer, count + i);
+	*iptr = count + i;
+	return(count);
 }

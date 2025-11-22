@@ -2,23 +2,23 @@
 #include <unistd.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <stdio.h>
 /**
  * _putchar - writes the character to stdout
  * @c: character to write
  *
- * Return: 1 - the number of chars written to stdout 
+ * Return: 1 - the number of chars written to stdout
  */
 int _putchar(const char c)
 {
 	return (write(1, &c, 1));
 }
-
 char *createbuffer(void)
 {
 	int buffersize = 1024;
 	int i;
 	char *buffer;
-	
+
 	buffer = malloc(buffersize * sizeof(char));
 	if (buffer == NULL)
 		return (NULL);
@@ -28,43 +28,21 @@ char *createbuffer(void)
 	}
 	return (buffer);
 }
-int writetobuffer(char *str)
-{
-	char *buffer;
-	int rtn = 0;
-	int i = 0;
 
-	buffer = createbuffer();
-	if (buffer == NULL)
-		return (-1);
-	while (*str != '\0')
-	{
-		if (i == 1024)
-		{
-			rtn += printbuffer(buffer, i);
-			buffer = createbuffer();
-			if (buffer == NULL)
-				return (-1);
-			i = 0;
-		}
-		buffer[i] = *str;
-		str++;
-		i++;
-	}
-	rtn += printbuffer(buffer, i);
-	return (rtn);
-}
-void freebuffer(char *createdbuffer)
+unsigned int checkbuffer(char *buffer, unsigned int *iptr, unsigned int write_size)
 {
-	free(createdbuffer);
+	unsigned int i = *iptr;
+	if ((i + write_size) >= 1024)
+	{
+		printbuffer(buffer, i);
+		return(0);
+	}
+	return (i);
 }
+
 int printbuffer(char *buffer, unsigned int size)
 {
-	unsigned int i = 0;
-
-	i = write(1, buffer, size);
-	free(buffer);
-	return (i);
+	return(write(1, buffer, size));
 }
 
 /**
@@ -77,12 +55,14 @@ int printbuffer(char *buffer, unsigned int size)
 int _printf(const char *format, ...)
 {
 	va_list args;
-	int i = 0;
+
+	unsigned int i = 0;
+
 	unsigned int j = 0;
 	unsigned int rtn = 0;
-	unsigned int s_size;
+	unsigned int struct_size;
 	const char *ptr = format;
-	char *conv;
+	char *buffer;
 
 	print printer[] = {
 		{"c", print_char},
@@ -95,58 +75,64 @@ int _printf(const char *format, ...)
 		{"X", print_hex_u},
 		{"b", print_binary},
 		{"S", print_ascii},
-		{"p", print_memory}
+		{"p", print_memory},
 	};
-	
-	s_size = (sizeof(printer) / sizeof(printer[0]));
+
+	struct_size = (sizeof(printer) / sizeof(printer[0]));
 	va_start(args, format);
-	conv = createbuffer();	
-	if (conv == NULL)
+
+	buffer = createbuffer();
+	if (buffer == NULL)
 		return (-1);
 
 	while (*ptr != '\0')
 	{
-		if (i == 1024)
-		{
-			rtn += writetobuffer(conv);
-			conv = createbuffer();
-		}
 		if (*ptr != '%')
-			conv[i] = *ptr;
-		else
+		{
+			buffer[i] = *ptr;
+			ptr++;
+			i++;
+			rtn++;
+			continue;
+		}
+		if (*ptr == '%')
 		{
 			ptr++;
 			if (*ptr == '\0')
-				return (-1);
+			return (-1);
+
 			if (*ptr == '%')
-				conv[i] = *ptr;
-			else
 			{
-				j = 0;
-				while (j < s_size)
-				{
-					if (*(printer[j].conversion) == *ptr)
-					{
-						conv[i] = '\0';
-						rtn += writetobuffer(conv);
-						conv = createbuffer();
-						i = -1;
-						rtn += printer[j].function(args);
-						break;
-					}
-					j++;
-				}
-				if (j == s_size)
-				{
-					conv[i] = '%';
-					i++;
-					conv[i] = *ptr;
-				}
+				buffer[i] = *ptr;
+				i++;
+				ptr++;
+				rtn++;
+				continue;
 			}
+			j = 0;
+			while (j < struct_size)
+			{
+				if (*(printer[j].conversion) == *ptr)
+				{
+					rtn += printer[j].function(args, buffer, &i);
+					break;
+				}
+				j++;
+			}
+			if (j == struct_size)
+			{
+				buffer[i] = '%';
+				i++;
+				rtn++;
+				buffer[i] = *ptr;
+			}
+			ptr++;
+			i++;
+			rtn++;
 		}
-		ptr++;
-		i++;
 	}
 	va_end(args);
-	return (printbuffer(conv, i) + rtn);
+	printbuffer(buffer, i);
+	free(buffer);
+	return (rtn);
 }

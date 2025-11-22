@@ -1,23 +1,22 @@
 #include "main.h"
 #include <stdarg.h>
-#include <limits.h>
+#include <stddef.h>
 /**
- * int_print_rec - prints int chars recursively
+ * write_int - prints int chars recursively
  * @n: the number
  *
- * Return: 1 - one char per recursion
+ * Return: number of chars to print
  */
-unsigned int int_print_rec(unsigned int n, char *conv)
+unsigned int write_int(unsigned int n, char *buffer, unsigned int i)
 {
-	int i = 0;
-	
+	unsigned int count = 0;
 	if (n / 10 != 0)
 	{
-		i += int_print_rec((n / 10), conv);
+		count += write_int((n / 10), buffer, i);
+		count++;
 	}
-	conv[i] = (n % 10 + '0');
-	i++;
-	return (i);
+	buffer[count + i] = (n % 10 + '0');
+	return (count);
 }
 /**
  * print_int - prints an integer
@@ -25,22 +24,26 @@ unsigned int int_print_rec(unsigned int n, char *conv)
  *
  * Return: the number of chars in the int
  */
-int print_int(va_list arg)
+int print_int(va_list arg, char *buffer, unsigned int *iptr)
 {
-	char *conv;
-	unsigned int i = 0;
+	unsigned int i;
 	int n;
-	conv = createbuffer();
+	unsigned int count = 0;
 
 	n = va_arg(arg, int);
+
+	i = checkbuffer(buffer, iptr, (sizeof(n) * sizeof(unsigned int)) + (sizeof(char) * 1));
 	if (n < 0)
 	{
-		_putchar('-');
-		i += int_print_rec((unsigned int)n * -1, conv);
-		return (printbuffer(conv, i) + 1);
+		buffer[count + i] = '-';
+		count++;
+		count += write_int((unsigned int)n * -1, buffer, count + i);
+		(*iptr) = count + i;
+		return (count);
 	}
-	i += int_print_rec(n, conv);
-	return (printbuffer(conv, i));
+	count += write_int(n, buffer, i);
+	(*iptr) = count + i;
+	return (count);
 }
 /**
  * print_unsigned - prints unsigned integer
@@ -48,13 +51,16 @@ int print_int(va_list arg)
  *
  * Return: the number of chars in the int
  */
-int print_unsigned(va_list arg)
+int print_unsigned(va_list arg, char *buffer, unsigned int *iptr)
 {
-	char *conv;
-	int i = 0;
-	
-	conv = createbuffer();
-	i += int_print_rec(va_arg(arg, unsigned int), conv);
-	return(printbuffer(conv, i));
+	unsigned int i;
+	unsigned int n;
+	unsigned int count = 0;
 
+	n = va_arg(arg, unsigned int);
+
+	i = checkbuffer(buffer, iptr, (sizeof(n) * sizeof(unsigned int)) + (sizeof(char) * 1));
+	count += write_int(n, buffer, i);
+	(*iptr) = count + i;
+	return (count);
 }
