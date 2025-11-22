@@ -7,30 +7,16 @@
  *
  * Return: 1 - one char per recursion
  */
-int int_print_rec(unsigned int n)
+unsigned int int_print_rec(unsigned int n, char *conv)
 {
 	int i = 0;
 	
 	if (n / 10 != 0)
 	{
-		i += int_print_rec(n / 10);
+		i += int_print_rec((n / 10), conv);
 	}
-	i += _putchar(n % 10 + '0');
-	return (i);
-}
-/**
- * unsigned_print_rec - prints unsigned recursively
- * @n: the number to print
- *
- * Return: the number of chars printed
- */
-unsigned int unsigned_print_rec(unsigned int n)
-{
-	unsigned int i = 0;
-	
-	if ((n / 10) != 0)
-		i += unsigned_print_rec(n / 10);
-	i += _putchar(n % 10 + '0');
+	conv[i] = (n % 10 + '0');
+	i++;
 	return (i);
 }
 /**
@@ -41,18 +27,20 @@ unsigned int unsigned_print_rec(unsigned int n)
  */
 int print_int(va_list arg)
 {
-	int n;
+	char *conv;
 	unsigned int i = 0;
+	int n;
+	conv = createbuffer();
 
 	n = va_arg(arg, int);
 	if (n < 0)
 	{
-		i += _putchar('-');
-		i += int_print_rec((unsigned int)n * -1);
+		_putchar('-');
+		i += int_print_rec((unsigned int)n * -1, conv);
+		return (printbuffer(conv, i) + 1);
 	}
-	else
-		i += int_print_rec(n);
-	return (i);
+	i += int_print_rec(n, conv);
+	return (printbuffer(conv, i));
 }
 /**
  * print_unsigned - prints unsigned integer
@@ -62,9 +50,11 @@ int print_int(va_list arg)
  */
 int print_unsigned(va_list arg)
 {
-	unsigned int n;
-	unsigned int i = 0;
+	char *conv;
+	int i = 0;
+	
+	conv = createbuffer();
+	i += int_print_rec(va_arg(arg, unsigned int), conv);
+	return(printbuffer(conv, i));
 
-	n = va_arg(arg, unsigned int);
-	return (i += unsigned_print_rec(n));
 }

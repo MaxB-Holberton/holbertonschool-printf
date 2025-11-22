@@ -28,6 +28,36 @@ char *createbuffer(void)
 	}
 	return (buffer);
 }
+int writetobuffer(char *str)
+{
+	char *buffer;
+	int rtn = 0;
+	int i = 0;
+
+	buffer = createbuffer();
+	if (buffer == NULL)
+		return (-1);
+	while (*str != '\0')
+	{
+		if (i == 1024)
+		{
+			rtn += printbuffer(buffer, i);
+			buffer = createbuffer();
+			if (buffer == NULL)
+				return (-1);
+			i = 0;
+		}
+		buffer[i] = *str;
+		str++;
+		i++;
+	}
+	rtn += printbuffer(buffer, i);
+	return (rtn);
+}
+void freebuffer(char *createdbuffer)
+{
+	free(createdbuffer);
+}
 int printbuffer(char *buffer, unsigned int size)
 {
 	unsigned int i = 0;
