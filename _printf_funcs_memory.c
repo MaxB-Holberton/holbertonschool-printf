@@ -24,7 +24,16 @@ int print_memory(va_list arg, char *buffer, unsigned int *iptr)
 	unsigned int count = 0;
 
 	n = va_arg(arg, unsigned long);
-
+	if (n == 0)
+	{
+	       buffer[0 + *iptr] = '(';
+	       buffer[1 + *iptr] = 'n';
+	       buffer[2 + *iptr] = 'i';
+	       buffer[3 + *iptr] = 'l';
+	       buffer[4 + *iptr] = ')';
+	       *iptr += 4;
+	       return (4);
+	}
 	i = checkbuffer(buffer, iptr, (sizeof(n) * sizeof(unsigned long)) + (sizeof(char) * 2));
 	buffer[count + i] = '0';
 	count++;

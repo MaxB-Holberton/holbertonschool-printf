@@ -32,7 +32,7 @@ char *createbuffer(void)
 unsigned int checkbuffer(char *buffer, unsigned int *iptr, unsigned int write_size)
 {
 	unsigned int i = *iptr;
-	if ((i + write_size) >= 1024)
+	if ((i + write_size) > 1024)
 	{
 		printbuffer(buffer, i);
 		return(0);
