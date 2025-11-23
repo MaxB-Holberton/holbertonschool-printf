@@ -13,34 +13,30 @@ int _putchar(const char c)
 {
 	return (write(1, &c, 1));
 }
-char *createbuffer(void)
-{
-	int buffersize = 2048;
-	int i;
-	char *buffer;
 
-	buffer = malloc(buffersize * sizeof(char));
-	if (buffer == NULL)
-		return (NULL);
-	for (i = 0; i < buffersize; i++)
-	{
-		buffer[i] = '0';
-	}
-	return (buffer);
+/**
+ * printbuffer - Print the buffer and buffer pointer iptr to zero
+ * @bufer: the buffer to write to
+ * @size: the number of characters to write
+ * @iptr: the buffer pointer
+ *
+ * Return: the number of characters that have been written
+ */
+int writetostdout(char *buffer, unsigned int *iptr)
+{
+	unsigned int size = *iptr;
+	*iptr = 0;
+	return(write(1, buffer, size));
 }
 
-unsigned int checkbuffer(char *buffer, unsigned int *iptr, unsigned int write_size)
-{
-	unsigned int i = *iptr;
-	if ((i + write_size) > 2048)
-	{
-		printbuffer(buffer, i);
-		return(0);
-	}
-	return (i);
-}
-
-int printbuffer(char *buffer, unsigned int size)
+/**
+ * flush_buffer - print the buffer and free the memory
+ * @bufer: the buffer to write to
+ * @size: the number of characters to write
+ *
+ * Return: the number of characters that have been written
+ */
+int write_buffer(char *buffer, unsigned int size)
 {
 	return(write(1, buffer, size));
 }
@@ -55,18 +51,17 @@ int printbuffer(char *buffer, unsigned int size)
 int _printf(const char *format, ...)
 {
 	va_list args;
-
 	unsigned int i = 0;
-
 	unsigned int j = 0;
 	unsigned int rtn = 0;
 	unsigned int struct_size;
+
 	const char *ptr = format;
-	char *buffer;
 
 	print printer[] = {
 		{"c", print_char},
 		{"s", print_str},
+		{"S", print_ascii},
 		{"d", print_int},
 		{"i", print_int},
 		{"u", print_unsigned},
@@ -74,65 +69,41 @@ int _printf(const char *format, ...)
 		{"x", print_hex_l},
 		{"X", print_hex_u},
 		{"b", print_binary},
-		{"S", print_ascii},
-		{"p", print_memory},
+		{"p", print_memory}
 	};
 
 	struct_size = (sizeof(printer) / sizeof(printer[0]));
 	va_start(args, format);
 
-	buffer = createbuffer();
-	if (buffer == NULL)
-		return (-1);
-
-	while (*ptr != '\0')
+	for (i = 0; ptr[i] != '\0'; i++)
 	{
-		if (*ptr != '%')
+		if (ptr[i] == '%')
 		{
-			buffer[i] = *ptr;
-			ptr++;
 			i++;
-			rtn++;
-			continue;
-		}
-		if (*ptr == '%')
-		{
-			ptr++;
-			if (*ptr == '\0')
-			return (-1);
+			if (ptr[i] == '\0')
+				return (-1);
 
-			if (*ptr == '%')
+			if (ptr[i] == '%')
 			{
-				buffer[i] = *ptr;
-				i++;
-				ptr++;
-				rtn++;
+				rtn += _putchar('%');
 				continue;
 			}
 			j = 0;
 			while (j < struct_size)
 			{
-				if (*(printer[j].conversion) == *ptr)
+				if (*(printer[j].conversion) == ptr[i])
 				{
-					rtn += printer[j].function(args, buffer, &i);
+					rtn += printer[j].function(args);
 					break;
 				}
 				j++;
 			}
-			if (j == struct_size)
-			{
-				buffer[i] = '%';
-				i++;
-				rtn++;
-				buffer[i] = *ptr;
-			}
-			ptr++;
-			i++;
-			rtn++;
+			if (j != struct_size)
+				continue;
+			rtn += _putchar('%');
 		}
+		rtn += _putchar(ptr[i]);
 	}
 	va_end(args);
-	printbuffer(buffer, i);
-	free(buffer);
 	return (rtn);
 }

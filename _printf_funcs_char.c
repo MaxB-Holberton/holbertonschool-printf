@@ -1,92 +1,103 @@
 #include "main.h"
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdlib.h>
 /**
  * print_char - print a char
  * @arg: the char to print
  *
  * Return: 1 - since only a single char was printed
  */
-int print_char(va_list arg, char *buffer, unsigned int *iptr)
+int print_char(va_list arg)
 {
-	buffer[*iptr] = va_arg(arg, int);
-	return(1);
+	return (_putchar(va_arg(arg, int)));
+}
+/**
+ * print_null - print (null) to the buffer
+ * @buffer: the buffer
+ * @iptr: the current position in the buffer
+ *
+ * Return: 6 - as 6 chars were printed
+ */
+int print_null(void)
+{
+	unsigned int i = 0;
+
+	i += _putchar('(');
+	i += _putchar('n');
+	i += _putchar('u');
+	i += _putchar('l');
+	i += _putchar('l');
+	i += _putchar(')');
+	return (i);
 }
 /**
  * print_str - print a string
- * @arg: the string to print
+ * @arg: the arg to print
+ * @buffer: the buffer to write the char into
+ * @iptr: the current position in the buffer
  *
  * Return: number of characters printed
  */
-int print_str(va_list arg, char *buffer, unsigned int *iptr)
+int print_str(va_list arg)
 {
 	char *str;
-	unsigned int i;
-	unsigned int count = 0;
 
 	str = va_arg(arg, char *);
 	if (str == NULL)
-	{
-		buffer[0 + *iptr] = '(';
-		buffer[1 + *iptr] = 'n';
-		buffer[2 + *iptr] = 'u';
-		buffer[3 + *iptr] = 'l';
-		buffer[4 + *iptr] = 'l';
-		buffer[5 + *iptr] = ')';
-		*iptr = 5 + *iptr;
-		return (6);
-	}
-	i = checkbuffer(buffer, iptr, sizeof(str) * sizeof(char));
-	while (*str != '\0')
-	{
-		buffer[count + i] = *str;
-		str++;
-		count++;
-	}
-	*iptr = (count - 1) + i;
-	return (count);
+		return (print_null());
+/*
+ * *buffer;
+ * unsigned int i = 0;
+	buffer = malloc(sizeof(str) * sizeof(char));
+	if (buffer == NULL)
+		return (print_null());
+
+	for (i = 0; str[i] != '\0'; i++)
+		buffer[i] = str[i];
+	write_buffer(str, sizeof(str));
+	free(buffer);*/
+
+	return (write_buffer(str, sizeof(str)));
 }
-
-int print_ascii(va_list arg, char *buffer, unsigned int *iptr)
+/**
+ * print_str - print only ascii chars, other chars are \xFF (hex) vals
+ * @arg: the arg to print
+ * @buffer: the buffer to write the char into
+ * @iptr: the current position in the buffer
+ *
+ * Return: number of characters printed
+ */
+int print_ascii(va_list arg)
 {
-	char *str;
-	unsigned int i;
-	unsigned int count = 0;
+	char *str, *buffer;
+	unsigned int i = 0;
 
 	str = va_arg(arg, char *);
 	if (str == NULL)
-	{
-		buffer[0 + *iptr] = '(';
-		buffer[1 + *iptr] = 'n';
-		buffer[2 + *iptr] = 'u';
-		buffer[3 + *iptr] = 'l';
-		buffer[4 + *iptr] = 'l';
-		buffer[5 + *iptr] = ')';
-		*iptr = 5 + *iptr;
-		return (6);
-	}
-	i = checkbuffer(buffer, iptr, sizeof(str) * sizeof(char));
+		return (print_null());
 
-	while (*str != '\0')
+	/*
+	 * as the hex is 4 chars long, making it n *5
+	 * ensures that the full size of the string can be safely covered
+	 */
+	buffer = malloc(sizeof(str) * 5);
+	if (buffer == NULL)
+		return (print_null());
+
+	for (i = 0; str[i] != '\0'; i++)
 	{
 		if (*str >= 32 && *str < 127)
 		{
-			buffer[count + i] = *str;
-			str++;
-			count++;
+			buffer[i] = str[i];
 			continue;
 		}
-		buffer[count + i]  = '\\';
-		count++;
-		buffer[count + i]  = 'x';
+		buffer[i++]  = '\\';
+		buffer[i++]  = 'x';
 		if (*str < 16)
-		{
-			count++;
-			buffer[count + i]  = '0';
-		}
-		str++;
-		count++;
+			buffer[i++]  = '0';
 	}
-	*iptr = (count - 1) + i;
-	return (count);
+	write_buffer(buffer, i);
+	free(buffer);
+	return (i);
 }
