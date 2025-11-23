@@ -119,5 +119,5 @@ int _printf(const char *format, ...)
 	va_end(args);
 	write_buffer(buffer, j);
 	free(buffer);
-	return (rtn);
+	return (j);
 }
