@@ -54,56 +54,70 @@ int _printf(const char *format, ...)
 	unsigned int i = 0;
 	unsigned int j = 0;
 	unsigned int rtn = 0;
-	unsigned int struct_size;
-
 	const char *ptr = format;
+	char *buffer;
 
-	print printer[] = {
-		{"c", print_char},
-		{"s", print_str},
-		{"S", print_ascii},
-		{"d", print_int},
-		{"i", print_int},
-		{"u", print_unsigned},
-		{"o", print_octal},
-		{"x", print_hex_l},
-		{"X", print_hex_u},
-		{"b", print_binary},
-		{"p", print_memory}
-	};
+	buffer = malloc(2048 * sizeof(char));
+	if (buffer == NULL)
+		return (-1);
 
-	struct_size = (sizeof(printer) / sizeof(printer[0]));
 	va_start(args, format);
-
 	for (i = 0; ptr[i] != '\0'; i++)
 	{
-		if (ptr[i] == '%')
+		if (ptr[i] != '%')
 		{
-			i++;
-			if (ptr[i] == '\0')
-				return (-1);
-
-			if (ptr[i] == '%')
-			{
-				rtn += _putchar('%');
-				continue;
-			}
-			j = 0;
-			while (j < struct_size)
-			{
-				if (*(printer[j].conversion) == ptr[i])
-				{
-					rtn += printer[j].function(args);
-					break;
-				}
-				j++;
-			}
-			if (j != struct_size)
-				continue;
-			rtn += _putchar('%');
+			buffer[j++] = ptr[i];
+			rtn++;
+			continue;
 		}
-		rtn += _putchar(ptr[i]);
+		switch (ptr[++i]) {
+			case 'c':
+				rtn += print_char(args, buffer, &j);
+				break;
+			case 's':
+				rtn += print_str(args, buffer, &j);
+				break;
+			case 'S':
+				rtn += print_ascii(args, buffer, &j);
+				break;
+			case 'd':
+				rtn += print_int(args, buffer, &j);
+				break;
+			case 'i':
+				rtn += print_int(args, buffer, &j);
+				break;
+			case 'u':
+				rtn += print_unsigned(args, buffer, &j);
+				break;
+			case 'o':
+				rtn += print_octal(args, buffer, &j);
+				break;
+			case 'x':
+				rtn += print_hex_l(args, buffer, &j);
+				break;
+			case 'X':
+				rtn += print_hex_u(args, buffer, &j);
+				break;
+			case 'b':
+				rtn += print_binary(args, buffer, &j);
+				break;
+			case 'p':
+				rtn += print_memory(args, buffer, &j);
+				break;
+			case '%':
+				buffer[j++] = '%';
+				rtn++;
+				break;
+			case '\0':
+				return (-1);
+			default:
+				buffer[j++] = '%';
+				buffer[j++] = ptr[i];
+				rtn += 2;
+		}
 	}
 	va_end(args);
+	write_buffer(buffer, j);
+	free(buffer);
 	return (rtn);
 }

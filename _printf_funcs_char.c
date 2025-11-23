@@ -2,15 +2,18 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdlib.h>
+
+#include <stdio.h>
 /**
  * print_char - print a char
  * @arg: the char to print
  *
  * Return: 1 - since only a single char was printed
  */
-int print_char(va_list arg)
+int print_char(va_list arg, char *buffer, unsigned int *iptr)
 {
-	return (_putchar(va_arg(arg, int)));
+	buffer[(*iptr)++] = va_arg(arg, int);
+	return (1);
 }
 /**
  * print_null - print (null) to the buffer
@@ -19,17 +22,15 @@ int print_char(va_list arg)
  *
  * Return: 6 - as 6 chars were printed
  */
-int print_null(void)
+int print_null(char *buffer, unsigned int *iptr)
 {
-	unsigned int i = 0;
-
-	i += _putchar('(');
-	i += _putchar('n');
-	i += _putchar('u');
-	i += _putchar('l');
-	i += _putchar('l');
-	i += _putchar(')');
-	return (i);
+	buffer[(*iptr)++] = '(';
+	buffer[(*iptr)++] = 'n';
+	buffer[(*iptr)++] = 'u';
+	buffer[(*iptr)++] = 'l';
+	buffer[(*iptr)++] = 'l';
+	buffer[(*iptr)++] = ')';
+	return (6);
 }
 /**
  * print_str - print a string
@@ -39,26 +40,22 @@ int print_null(void)
  *
  * Return: number of characters printed
  */
-int print_str(va_list arg)
+int print_str(va_list arg, char *buffer, unsigned int *iptr)
 {
 	char *str;
+	unsigned int i = 0;
 
 	str = va_arg(arg, char *);
 	if (str == NULL)
-		return (print_null());
-/*
- * *buffer;
- * unsigned int i = 0;
-	buffer = malloc(sizeof(str) * sizeof(char));
-	if (buffer == NULL)
-		return (print_null());
+		return (print_null(buffer, iptr));
 
-	for (i = 0; str[i] != '\0'; i++)
-		buffer[i] = str[i];
-	write_buffer(str, sizeof(str));
-	free(buffer);*/
-
-	return (write_buffer(str, sizeof(str)));
+	while (*str != '\0')
+	{
+		buffer[(*iptr)++] = *str;
+		str++;
+		i++;
+	}
+	return (i);
 }
 /**
  * print_str - print only ascii chars, other chars are \xFF (hex) vals
@@ -68,36 +65,33 @@ int print_str(va_list arg)
  *
  * Return: number of characters printed
  */
-int print_ascii(va_list arg)
+int print_ascii(va_list arg, char *buffer, unsigned int *iptr)
 {
-	char *str, *buffer;
+	char *str;
 	unsigned int i = 0;
 
 	str = va_arg(arg, char *);
 	if (str == NULL)
-		return (print_null());
+		return (print_null(buffer, iptr));
 
-	/*
-	 * as the hex is 4 chars long, making it n *5
-	 * ensures that the full size of the string can be safely covered
-	 */
-	buffer = malloc(sizeof(str) * 5);
-	if (buffer == NULL)
-		return (print_null());
-
-	for (i = 0; str[i] != '\0'; i++)
+	while (*str != '\0')
 	{
 		if (*str >= 32 && *str < 127)
 		{
-			buffer[i] = str[i];
+			buffer[(*iptr)++] = (*str)++;
+			i++;
 			continue;
 		}
-		buffer[i++]  = '\\';
-		buffer[i++]  = 'x';
+		buffer[(*iptr)++]  = '\\';
+		buffer[(*iptr)++]  = 'x';
+		i += 2;
 		if (*str < 16)
-			buffer[i++]  = '0';
+		{
+			buffer[(*iptr)++] = '0';
+			i++;
+		}
+		buffer[(*iptr)++] = (*str)++;
+		i++;
 	}
-	write_buffer(buffer, i);
-	free(buffer);
 	return (i);
 }

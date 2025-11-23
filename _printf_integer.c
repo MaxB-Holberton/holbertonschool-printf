@@ -7,14 +7,16 @@
  *
  * Return: number of chars to print
  */
-unsigned int write_int(unsigned int n)
+unsigned int write_int(unsigned int n, char *buffer, unsigned int *iptr)
 {
 	unsigned int count = 0;
 
 	if ((n / 10) != 0)
-		count = write_int((n / 10));
-
-	count += _putchar((n % 10) + '0');
+	{
+		count = write_int((n / 10), buffer, iptr);
+		count++;
+	}
+	buffer[(*iptr)++] = ((n % 10) + '0');
 	return (count);
 }
 /**
@@ -23,17 +25,17 @@ unsigned int write_int(unsigned int n)
  *
  * Return: the number of chars in the int
  */
-int print_int(va_list arg)
+int print_int(va_list arg, char *buffer, unsigned int *iptr)
 {
 	int n;
 
 	n = va_arg(arg, int);
 	if (n < 0)
 	{
-		_putchar('-');
-		return (write_int((unsigned int)n * -1) + 1);
+		buffer[(*iptr)++] = '-';
+		return (write_int((unsigned int)n * -1, buffer, iptr) + 1);
 	}
-	return (write_int(n));
+	return (write_int(n, buffer, iptr));
 }
 /**
  * print_unsigned - prints unsigned integer
@@ -41,7 +43,7 @@ int print_int(va_list arg)
  *
  * Return: the number of chars in the int
  */
-int print_unsigned(va_list arg)
+int print_unsigned(va_list arg, char *buffer, unsigned int *iptr)
 {
-	return (write_int(va_arg(arg, int)));
+	return (write_int(va_arg(arg, int), buffer, iptr));
 }
